@@ -1,0 +1,17 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Chrome Extension artifacts
+*.crx
+*.pem
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+/tmp/
+.gemini/

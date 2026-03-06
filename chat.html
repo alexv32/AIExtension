@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="chat.css">
+    <title>Chat - AI Assistant Pro</title>
+</head>
+
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <button class="btn-icon" id="backBtn" title="Back">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <div class="chat-header-info">
+                <h1>Chat</h1>
+                <span class="chat-model-label" id="chatModelLabel">No model</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="historyBtn" title="Chat History">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
+                <button class="btn-icon" id="docsMenuBtn" title="Documents">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="5" r="2" />
+                        <circle cx="12" cy="12" r="2" />
+                        <circle cx="12" cy="19" r="2" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- History Drawer -->
+        <div class="history-drawer" id="historyDrawer">
+            <div class="drawer-header">
+                <span>Recent Chats</span>
+                <button class="btn btn-secondary new-chat-btn" id="newChatBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    New Chat
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- History items will be injected here -->
+            </div>
+            <div class="drawer-footer">
+                <button class="btn-text" id="clearHistoryBtn">Clear All History</button>
+            </div>
+        </div>
+
+        <!-- Wake word indicator -->
+        <div class="wake-word-bar" id="wakeWordBar">
+            <div class="wake-dot"></div>
+            <span>Say <strong>"Hey <span id="wakeWordName">Assistant</span>"</strong> to start talking</span>
+            <button class="btn-icon wake-toggle" id="wakeToggle" title="Toggle wake word">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Documents dropdown -->
+        <div class="docs-dropdown" id="docsDropdown">
+            <div class="docs-dropdown-header">
+                <span>Knowledge Documents</span>
+                <label class="upload-label" for="fileUpload">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add File
+                </label>
+                <input type="file" id="fileUpload" accept=".pdf,.docx" multiple hidden>
+            </div>
+            <div class="docs-list" id="docsList">
+                <div class="docs-empty" id="docsEmpty">No documents added yet</div>
+            </div>
+        </div>
+
+        <!-- Messages area -->
+        <div class="messages-area" id="messagesArea">
+            <div class="welcome-message">
+                <div class="welcome-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <h2>Hello! How can I help?</h2>
+                <p>Ask me anything, or upload documents for context-aware assistance.</p>
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1"></textarea>
+                <div class="input-actions">
+                    <button class="btn-icon voice-btn" id="voiceBtn" title="Voice input">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                            <line x1="12" y1="19" x2="12" y2="23" />
+                            <line x1="8" y1="23" x2="16" y2="23" />
+                        </svg>
+                    </button>
+                    <button class="btn-icon send-btn" id="sendBtn" title="Send">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/pdf.min.js"></script>
+    <script src="lib/mammoth.browser.min.js"></script>
+    <script src="crypto.js"></script>
+    <script src="history.js"></script>
+    <script src="documents.js"></script>
+    <script src="chat.js"></script>
+</body>
+
+</html>
