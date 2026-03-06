@@ -31,58 +31,7 @@
     color: var(--text-muted);
 }
 
-/* Wake word bar */
-.wake-word-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    background: rgba(124, 58, 237, 0.08);
-    border-bottom: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--text-secondary);
-    animation: fadeIn 0.3s ease;
-}
-
-.wake-word-bar.disabled {
-    opacity: 0.4;
-}
-
-.wake-word-bar.listening {
-    background: rgba(16, 185, 129, 0.1);
-}
-
-.wake-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent-purple);
-    box-shadow: 0 0 8px var(--accent-purple);
-    animation: pulse 2s ease-in-out infinite;
-    flex-shrink: 0;
-}
-
-.wake-word-bar.disabled .wake-dot {
-    background: var(--text-muted);
-    box-shadow: none;
-    animation: none;
-}
-
-.wake-word-bar.listening .wake-dot {
-    background: var(--success);
-    box-shadow: 0 0 8px var(--success);
-}
-
-.wake-toggle {
-    width: 24px;
-    height: 24px;
-    margin-left: auto;
-}
-
-.wake-word-bar strong {
-    color: var(--text-primary);
-}
-
+/* Wake word bar is now in common.css */
 
 .header-actions {
     display: flex;

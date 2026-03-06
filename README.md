@@ -37,8 +37,6 @@ This extension has undergone a rigorous security audit and features:
 4.  Click **"Load unpacked"** and select the extension directory.
 5.  Use the shortcut `Ctrl+Shift+Y` to open your new sidebar!
 
-### From CRX
-A pre-packaged `AIExtension.crx` and the signing key `AIExtension.pem` are included in the root directory for manual enterprise distribution or signing.
 
 ## ⚙️ Configuration
 1.  Open the extension settings via the ⚙️ icon.

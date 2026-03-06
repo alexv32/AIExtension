@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Delay slightly to ensure everything is ready
         setTimeout(() => toggleVoice(true), 500);
     } else {
-        startWakeWordListener();
+        VoiceShared.init(() => toggleVoice(true));
     }
 
     // Back navigation
@@ -362,10 +362,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (!SpeechRecognition) {
+            addErrorMessage('Speech recognition is not supported in this browser.');
+            return;
+        }
+
         recognition = new SpeechRecognition();
         recognition.continuous = false;
-        recognition.interimResults = true;
+        recognition.interimResults = false; // Disable interim results to reduce network noise
         recognition.lang = 'en-US';
 
         recognition.onstart = () => {
@@ -387,9 +392,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
             stopRecording();
+
+            let message = 'Speech recognition failed.';
             if (event.error === 'not-allowed') {
-                addErrorMessage('Microphone access denied. Please allow microphone access.');
+                message = 'Microphone access denied. Please click the microphone icon and allow access in the browser prompt.';
+            } else if (event.error === 'network') {
+                message = 'Speech recognition requires an internet connection (Google STT service). Please check your network.';
+            } else if (event.error === 'no-speech') {
+                message = 'No speech detected. Please try again.';
+            } else if (event.error === 'service-not-allowed') {
+                message = 'Speech service not allowed. This can happen if the extension is in a restricted environment.';
             }
+
+            addErrorMessage(message);
         };
 
         recognition.onend = () => {
@@ -416,83 +431,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         isAutoSend = false;
 
         // Restart wake word listener after manual recording ends
-        if (wakeWordEnabled) {
-            setTimeout(() => startWakeWordListener(), 500);
-        }
+        VoiceShared.startListener(() => toggleVoice(true));
     }
 
-    // =================== Wake Word Detection ===================
 
-    function startWakeWordListener() {
-        if (!wakeWordEnabled) return;
-        if (isRecording) return; // Don't interfere with active recording
-        if (wakeWordRecognition) return; // Already listening
+    // Wake Word logic moved to voice-shared.js
 
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) {
-            wakeWordBar.classList.add('disabled');
-            return;
-        }
-
-        wakeWordRecognition = new SR();
-        wakeWordRecognition.continuous = true;
-        wakeWordRecognition.interimResults = true;
-        wakeWordRecognition.lang = 'en-US';
-
-        wakeWordRecognition.onresult = (event) => {
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript.toLowerCase().trim();
-                const wakePhrase = `hey ${aiName.toLowerCase()}`;
-
-                if (transcript.includes(wakePhrase)) {
-                    // Wake word detected! Stop wake listener and start voice input
-                    stopWakeWordListener();
-                    wakeWordBar.classList.add('listening');
-
-                    // Brief visual feedback before starting voice input
-                    setTimeout(() => {
-                        wakeWordBar.classList.remove('listening');
-                        toggleVoice();
-                    }, 300);
-                    return;
-                }
-            }
-        };
-
-        wakeWordRecognition.onerror = (event) => {
-            if (event.error === 'not-allowed') {
-                wakeWordBar.classList.add('disabled');
-                wakeWordEnabled = false;
-                return;
-            }
-            // For other errors (no-speech, network), restart
-            stopWakeWordListener();
-            if (wakeWordEnabled) {
-                setTimeout(() => startWakeWordListener(), 1000);
-            }
-        };
-
-        wakeWordRecognition.onend = () => {
-            wakeWordRecognition = null;
-            // Auto-restart if still enabled and not actively recording
-            if (wakeWordEnabled && !isRecording) {
-                setTimeout(() => startWakeWordListener(), 300);
-            }
-        };
-
-        try {
-            wakeWordRecognition.start();
-        } catch (e) {
-            wakeWordRecognition = null;
-        }
-    }
-
-    function stopWakeWordListener() {
-        if (wakeWordRecognition) {
-            try { wakeWordRecognition.stop(); } catch (e) { /* ignore */ }
-            wakeWordRecognition = null;
-        }
-    }
 
     // Document rendering
     function renderDocItem(doc) {

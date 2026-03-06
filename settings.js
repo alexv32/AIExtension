@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveBtn');
     const saveFeedback = document.getElementById('saveFeedback');
 
+    // Initialize Voice
+    VoiceShared.init();
+
     // Load saved settings
     const saved = await chrome.storage.local.get([
         'selectedProvider', 'selectedModelId', 'encryptedApiKey', 'aiName'

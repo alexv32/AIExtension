@@ -32,6 +32,18 @@
       </button>
     </header>
 
+    <!-- Wake word indicator -->
+    <div class="wake-word-bar" id="wakeWordBar">
+      <div class="wake-dot"></div>
+      <span>Say <strong>"Hey <span id="wakeWordName">Assistant</span>"</strong> to start talking</span>
+      <button class="btn-icon wake-toggle" id="wakeToggle" title="Toggle wake word">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        </svg>
+      </button>
+    </div>
+
     <div class="dropdown-menu" id="dropdownMenu">
       <button class="dropdown-item" id="addButtonBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -128,6 +140,7 @@
 
   <script src="crypto.js"></script>
   <script src="custom-buttons.js"></script>
+  <script src="voice-shared.js"></script>
   <script src="popup.js"></script>
 </body>
 

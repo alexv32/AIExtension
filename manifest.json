@@ -43,6 +43,6 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.google.com https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com"
   }
 }

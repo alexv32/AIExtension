@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadModelBadge();
 
     // Start wake word listener
-    startWakeWordListener();
+    VoiceShared.init();
 
     // Mode Toggle Logic
     linkModeBtn.addEventListener('click', () => {
@@ -192,44 +192,6 @@ async function loadCustomButtons() {
     CustomButtons.updateEmptyState();
 }
 
-function startWakeWordListener() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
 
-    chrome.storage.local.get(['aiName'], (result) => {
-        if (result.aiName) aiName = result.aiName;
+// Wake word logic moved to voice-shared.js
 
-        wakeWordRecognition = new SR();
-        wakeWordRecognition.continuous = true;
-        wakeWordRecognition.interimResults = true;
-        wakeWordRecognition.lang = 'en-US';
-
-        wakeWordRecognition.onresult = (event) => {
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript.toLowerCase().trim();
-                const wakePhrase = `hey ${aiName.toLowerCase()}`;
-
-                if (transcript.includes(wakePhrase)) {
-                    stopWakeWordListener();
-                    window.location.href = 'chat.html?auto=true';
-                    return;
-                }
-            }
-        };
-
-        wakeWordRecognition.onend = () => {
-            if (wakeWordRecognition) {
-                setTimeout(() => startWakeWordListener(), 300);
-            }
-        };
-
-        try { wakeWordRecognition.start(); } catch (e) { }
-    });
-}
-
-function stopWakeWordListener() {
-    if (wakeWordRecognition) {
-        try { wakeWordRecognition.stop(); } catch (e) { }
-        wakeWordRecognition = null;
-    }
-}
