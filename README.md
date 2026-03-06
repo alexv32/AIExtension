@@ -45,5 +45,13 @@ This extension has undergone a rigorous security audit and features:
 4.  Set your AI's name for the wake word feature (e.g., "Jarvis").
 5.  **Save** and start chatting!
 
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
 ---
 *Created with a focus on Privacy, Security, and Architectural Excellence.*
