@@ -34,10 +34,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function handleChatRequest({ provider, model, messages, apiKey }) {
-    // Support legacy 'model' field or new 'provider' field
-    const p = provider || detectProvider(model);
+    if (!provider) {
+        return { success: false, error: 'Missing provider. Please select a provider in Settings.' };
+    }
     const modelId = model;
-    switch (p) {
+    switch (provider) {
         case 'openai':
             return await callOpenAI(apiKey, messages, modelId);
         case 'google':
@@ -45,16 +46,8 @@ async function handleChatRequest({ provider, model, messages, apiKey }) {
         case 'anthropic':
             return await callClaude(apiKey, messages, modelId);
         default:
-            return { success: false, error: `Unknown provider: ${p}` };
+            return { success: false, error: `Unknown provider: ${provider}` };
     }
-}
-
-function detectProvider(model) {
-    if (!model) return null;
-    if (model.startsWith('gpt') || model.startsWith('o1') || model.startsWith('o3')) return 'openai';
-    if (model.startsWith('gemini')) return 'google';
-    if (model.startsWith('claude')) return 'anthropic';
-    return null;
 }
 
 async function callOpenAI(apiKey, messages, modelId) {
@@ -173,7 +166,7 @@ async function callClaude(apiKey, messages, modelId) {
     return { success: true, message: data.content[0].text };
 }
 
-async function handleButtonGeneration({ description, model, apiKey, buttonName }) {
+async function handleButtonGeneration({ description, provider, model, apiKey, buttonName }) {
     const messages = [
         {
             role: 'system',
@@ -201,7 +194,7 @@ OUTPUT: Return ONLY the JSON object. No markdown, no explanation, no backticks.`
         }
     ];
 
-    const result = await handleChatRequest({ model, messages, apiKey });
+    const result = await handleChatRequest({ provider, model, messages, apiKey });
     if (!result.success) return result;
 
     try {

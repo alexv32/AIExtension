@@ -10,8 +10,13 @@ const HistoryModule = (() => {
      * Get all conversations from storage
      */
     async function getAll() {
-        const result = await chrome.storage.local.get(STORAGE_KEY);
-        return result[STORAGE_KEY] || [];
+        try {
+            const result = await chrome.storage.local.get(STORAGE_KEY);
+            return result[STORAGE_KEY] || [];
+        } catch (err) {
+            console.error('[History] Failed to read from storage:', err);
+            return [];
+        }
     }
 
     /**
@@ -44,7 +49,12 @@ const HistoryModule = (() => {
             history = history.slice(0, MAX_HISTORY);
         }
 
-        await chrome.storage.local.set({ [STORAGE_KEY]: history });
+        try {
+            await chrome.storage.local.set({ [STORAGE_KEY]: history });
+        } catch (err) {
+            console.error('[History] Failed to save to storage:', err);
+            throw new Error('Could not save chat history. Storage may be full or unavailable.');
+        }
         return conversation;
     }
 
@@ -62,14 +72,24 @@ const HistoryModule = (() => {
     async function deleteById(id) {
         let history = await getAll();
         history = history.filter(h => h.id !== id);
-        await chrome.storage.local.set({ [STORAGE_KEY]: history });
+        try {
+            await chrome.storage.local.set({ [STORAGE_KEY]: history });
+        } catch (err) {
+            console.error('[History] Failed to delete from storage:', err);
+            throw new Error('Could not delete conversation. Storage may be unavailable.');
+        }
     }
 
     /**
      * Clear all history
      */
     async function clearAll() {
-        await chrome.storage.local.remove(STORAGE_KEY);
+        try {
+            await chrome.storage.local.remove(STORAGE_KEY);
+        } catch (err) {
+            console.error('[History] Failed to clear storage:', err);
+            throw new Error('Could not clear history. Storage may be unavailable.');
+        }
     }
 
     /**

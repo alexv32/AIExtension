@@ -1,52 +1,78 @@
 /**
  * Shared Voice Module
  * Handles cross-page wake word listening and speech engine state
+ *
+ * State is always read from chrome.storage.local rather than cached in memory,
+ * so multiple pages never drift out of sync.
  */
 
 const VoiceShared = (() => {
     let wakeWordRecognition = null;
-    let wakeWordEnabled = true;
-    let aiName = 'Assistant';
+
+    /** Read the current wake-word-enabled flag from storage (defaults to true). */
+    const getWakeWordEnabled = async () => {
+        try {
+            const result = await chrome.storage.local.get('wakeWordEnabled');
+            return result.wakeWordEnabled !== undefined ? result.wakeWordEnabled : true;
+        } catch (err) {
+            console.error('[VoiceShared] Failed to read wakeWordEnabled:', err);
+            return true;
+        }
+    };
+
+    /** Read the current AI name from storage (defaults to 'Assistant'). */
+    const getAiName = async () => {
+        try {
+            const result = await chrome.storage.local.get('aiName');
+            return result.aiName || 'Assistant';
+        } catch (err) {
+            console.error('[VoiceShared] Failed to read aiName:', err);
+            return 'Assistant';
+        }
+    };
 
     const init = async (onDetected) => {
-        const settings = await chrome.storage.local.get(['aiName', 'wakeWordEnabled']);
-        if (settings.aiName) aiName = settings.aiName;
-        if (settings.wakeWordEnabled !== undefined) wakeWordEnabled = settings.wakeWordEnabled;
+        const aiName = await getAiName();
+        const enabled = await getWakeWordEnabled();
 
-        const wakeWordBar = document.getElementById('wakeWordBar');
         const wakeWordName = document.getElementById('wakeWordName');
         const wakeToggle = document.getElementById('wakeToggle');
 
         if (wakeWordName) wakeWordName.textContent = aiName;
 
         if (wakeToggle) {
-            wakeToggle.addEventListener('click', () => {
-                wakeWordEnabled = !wakeWordEnabled;
-                chrome.storage.local.set({ wakeWordEnabled });
-                updateUI();
-                if (wakeWordEnabled) startListener(onDetected);
+            wakeToggle.addEventListener('click', async () => {
+                const current = await getWakeWordEnabled();
+                const next = !current;
+                await chrome.storage.local.set({ wakeWordEnabled: next });
+                await updateUI();
+                if (next) startListener(onDetected);
                 else stopListener();
             });
         }
 
-        updateUI();
-        if (wakeWordEnabled) startListener(onDetected);
+        await updateUI();
+        if (enabled) startListener(onDetected);
     };
 
-    const updateUI = () => {
+    const updateUI = async () => {
         const wakeWordBar = document.getElementById('wakeWordBar');
         if (wakeWordBar) {
-            if (wakeWordEnabled) wakeWordBar.classList.remove('disabled');
+            const enabled = await getWakeWordEnabled();
+            if (enabled) wakeWordBar.classList.remove('disabled');
             else wakeWordBar.classList.add('disabled');
         }
     };
 
-    const startListener = (onDetected) => {
-        if (!wakeWordEnabled) return;
+    const startListener = async (onDetected) => {
+        const enabled = await getWakeWordEnabled();
+        if (!enabled) return;
         if (wakeWordRecognition) return;
 
         const SR = window.webkitSpeechRecognition || window.SpeechRecognition;
         if (!SR) return;
+
+        const aiName = await getAiName();
 
         wakeWordRecognition = new SR();
         wakeWordRecognition.continuous = true;
@@ -81,19 +107,20 @@ const VoiceShared = (() => {
             }
         };
 
-        wakeWordRecognition.onerror = (event) => {
+        wakeWordRecognition.onerror = async (event) => {
             if (event.error === 'not-allowed') {
-                wakeWordEnabled = false;
-                updateUI();
+                await chrome.storage.local.set({ wakeWordEnabled: false });
+                await updateUI();
                 return;
             }
             stopListener();
             setTimeout(() => startListener(onDetected), 1000);
         };
 
-        wakeWordRecognition.onend = () => {
+        wakeWordRecognition.onend = async () => {
             wakeWordRecognition = null;
-            if (wakeWordEnabled) {
+            const stillEnabled = await getWakeWordEnabled();
+            if (stillEnabled) {
                 setTimeout(() => startListener(onDetected), 300);
             }
         };
@@ -109,7 +136,7 @@ const VoiceShared = (() => {
         }
     };
 
-    const isEnabled = () => wakeWordEnabled;
+    const isEnabled = async () => await getWakeWordEnabled();
 
     return { init, startListener, stopListener, isEnabled };
 })();

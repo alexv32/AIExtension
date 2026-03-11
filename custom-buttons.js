@@ -6,12 +6,22 @@ const CustomButtons = (() => {
     const STORAGE_KEY = 'customButtons';
 
     async function getAll() {
-        const result = await chrome.storage.local.get(STORAGE_KEY);
-        return result[STORAGE_KEY] || [];
+        try {
+            const result = await chrome.storage.local.get(STORAGE_KEY);
+            return result[STORAGE_KEY] || [];
+        } catch (err) {
+            console.error('[CustomButtons] Failed to read from storage:', err);
+            return [];
+        }
     }
 
     async function save(buttons) {
-        await chrome.storage.local.set({ [STORAGE_KEY]: buttons });
+        try {
+            await chrome.storage.local.set({ [STORAGE_KEY]: buttons });
+        } catch (err) {
+            console.error('[CustomButtons] Failed to save to storage:', err);
+            throw new Error('Could not save buttons. Storage may be full or unavailable.');
+        }
     }
 
     async function add(button) {
@@ -196,12 +206,6 @@ const CustomButtons = (() => {
         });
 
         container.appendChild(wrapper);
-    }
-
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
     }
 
     function updateEmptyState() {

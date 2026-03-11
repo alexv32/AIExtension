@@ -1,6 +1,10 @@
-# AI Assistant Pro - Senior Architect Chrome Extension
+# AI Assistant - Chrome Extension
 
-AI Assistant Pro is a high-performance, secure, and feature-rich Chrome extension that integrates advanced AI models (Gemini, ChatGPT, Claude) directly into your browsing experience via a native sidebar.
+![AI Assistant Extension](assets/mockup.png)
+
+A powerful, multi-model AI assistant that lives in your browser as a sidebar and popup. Features voice interaction, document analysis, and custom-built dynamic buttons.
+
+[View Changelog & Architectural Decisions](CHANGELOG.md)
 
 ## 🚀 Key Features
 

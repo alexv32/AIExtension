@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function populateModels(provider) {
         const models = MODEL_OPTIONS[provider] || [];
-        modelSelect.textContent = '';
+        modelSelect.innerHTML = '';
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
         defaultOpt.textContent = 'Select a model...';

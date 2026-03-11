@@ -341,12 +341,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         messagesArea.scrollTop = messagesArea.scrollHeight;
     }
 
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
     // Voice input
     let isAutoSend = false;
     function toggleVoice(autoSend = false) {

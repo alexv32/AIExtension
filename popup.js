@@ -19,9 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aiFields = document.getElementById('aiFields');
     let activeMode = 'link'; // 'link' or 'ai'
 
-    let aiName = 'Assistant';
-    let wakeWordRecognition = null;
-
     // Load current model
     await loadModelBadge();
 

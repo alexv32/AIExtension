@@ -12,12 +12,22 @@ const DocumentsModule = (() => {
     const STORAGE_KEY = 'uploadedDocuments';
 
     async function getAll() {
-        const result = await chrome.storage.local.get(STORAGE_KEY);
-        return result[STORAGE_KEY] || [];
+        try {
+            const result = await chrome.storage.local.get(STORAGE_KEY);
+            return result[STORAGE_KEY] || [];
+        } catch (err) {
+            console.error('[Documents] Failed to read from storage:', err);
+            return [];
+        }
     }
 
     async function save(docs) {
-        await chrome.storage.local.set({ [STORAGE_KEY]: docs });
+        try {
+            await chrome.storage.local.set({ [STORAGE_KEY]: docs });
+        } catch (err) {
+            console.error('[Documents] Failed to save to storage:', err);
+            throw new Error('Could not save documents. Storage may be full or unavailable.');
+        }
     }
 
     async function addDocument(file) {
@@ -85,7 +95,10 @@ const DocumentsModule = (() => {
     }
 
     async function extractTextFallback(file) {
-        // Basic text extraction by reading the file as text and filtering
+        // Basic text extraction by reading the file as text and filtering.
+        // NOTE: This only extracts ASCII printable characters (bytes 32–126).
+        // Non-Latin scripts (Hebrew, Russian, CJK, etc.) will be silently dropped.
+        // For proper multilingual support, ensure pdf.js is loaded.
         const buffer = await file.arrayBuffer();
         const bytes = new Uint8Array(buffer);
         let text = '';
